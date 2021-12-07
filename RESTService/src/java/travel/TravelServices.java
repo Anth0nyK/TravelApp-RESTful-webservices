@@ -47,6 +47,8 @@ import java.nio.charset.StandardCharsets;
 @Path("travelProposal")
 public class TravelServices {
 
+    private final static String EXCHANGE_NAME = "testDirect";
+        
     @Context
     private UriInfo context;
 
@@ -91,6 +93,10 @@ public class TravelServices {
         JSONObject jsonobj = new JSONObject(result.toString());
         //Get the needed part, the UUID, from the json in String format
         UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
+        
+        DirectExchangeBinder DirectBinder = new DirectExchangeBinder();
+        DirectBinder.createExchangeAndQueue(EXCHANGE_NAME, UUID);
+        
         
         }
         catch(IOException e){
