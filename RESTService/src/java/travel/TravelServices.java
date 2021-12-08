@@ -42,13 +42,15 @@ import java.nio.charset.StandardCharsets;
 /**
  * REST Web Service
  *
+ *
  * @author Anthony
  */
 @Path("travelProposal")
 public class TravelServices {
 
-    private final static String EXCHANGE_NAME = "testDirect";
-        
+    private final static String Direct_EXCHANGE_NAME = "testDirect";
+    private final static String Fanout_EXCHANGE_NAME = "testFanout";
+    
     @Context
     private UriInfo context;
 
@@ -95,8 +97,10 @@ public class TravelServices {
         UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
         
         DirectExchangeBinder DirectBinder = new DirectExchangeBinder();
-        DirectBinder.createExchangeAndQueue(EXCHANGE_NAME, UUID);
+        DirectBinder.createExchangeAndQueue(Direct_EXCHANGE_NAME, UUID);
         
+        FanoutExchangeBinder FanoutBinder = new FanoutExchangeBinder();
+        FanoutBinder.createExchangeAndQueue(Fanout_EXCHANGE_NAME, UUID);
         
         }
         catch(IOException e){
