@@ -24,7 +24,7 @@ public class RabbitMQConnection {
             connection = factory.newConnection();
         }
         catch(Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         
         

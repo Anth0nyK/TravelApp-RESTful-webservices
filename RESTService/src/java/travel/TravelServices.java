@@ -35,6 +35,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import java.math.BigDecimal;
 
 import java.nio.charset.StandardCharsets;
 
@@ -96,49 +97,11 @@ public class TravelServices {
         //Get the needed part, the UUID, from the json in String format
         UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
         
-        DirectExchangeBinder DirectBinder = new DirectExchangeBinder();
-        DirectBinder.createExchangeAndQueue(Direct_EXCHANGE_NAME, UUID);
-        
-        FanoutExchangeBinder FanoutBinder = new FanoutExchangeBinder();
-        FanoutBinder.createExchangeAndQueue(Fanout_EXCHANGE_NAME, UUID);
         
         }
         catch(IOException e){
         };
         
-        /*
-        String query = "https://api.random.org/json-rpc/1/invokea";
-        String jsonBody = "{\"jsonrpc\":\"2.0\",\"method\":\"generateUUIDs\",\"params\":{\"apiKey\":\"b170a05d-268a-436b-b9e1-ce1a463ea38a\",\"n\":1},\"id\":0}";
-        
-        URL url = new URL(query);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(5000);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        
-        OutputStream os = connection.getOutputStream();
-        os.write(jsonBody.getBytes("UTF-8"));
-        os.close();
-        
-        BufferedReader bfreader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder result = new StringBuilder();
-        String line;
-        
-        
-        while ((line = bfreader.readLine()) != null) {
-             System.out.println(line);
-             result.append(line);
-        }
-        
-        bfreader.close();
-        
-        //Turn the string into JSONObject for further action
-        JSONObject jsonobj = new JSONObject(result.toString());
-        //Get the needed part, the UUID, from the json in String format
-        UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
-        */
         
         return UUID;
     }
@@ -153,7 +116,15 @@ public class TravelServices {
     public String getUserID() throws MalformedURLException, IOException {
        
         String TheUserID = generateUUID();
-       
+        if(TheUserID != "null"){
+            DirectExchangeBinder DirectBinder = new DirectExchangeBinder();
+            DirectBinder.createExchangeAndQueue(Direct_EXCHANGE_NAME, TheUserID);
+
+            FanoutExchangeBinder FanoutBinder = new FanoutExchangeBinder();
+            FanoutBinder.createExchangeAndQueue(Fanout_EXCHANGE_NAME, TheUserID);
+        }
+
+        
         return TheUserID;
     }
    
@@ -209,19 +180,60 @@ public class TravelServices {
         String messageID = "";
         messageID = generateUUID();
         
-        if((pFc != null) && (messageID != "")){
+        String theUserID = null;
+        coordinates theCoord = null;
+        BigDecimal theLat = null;
+        BigDecimal theLong = null;
+        String theDate = null;
+        
+        String message = "";
+        
+        try{
+            theUserID = pFc.getUserID();
+            theCoord = pFc.getCoord();
+            theLat = theCoord.getlat();
+            theLong = theCoord.getlong();
+            theDate = pFc.getDate();
+            
+        }catch(NullPointerException e){
+            
+        }
+        
+        
+        if((theUserID != null) && (theLat != null) && (theLong != null) && (theDate != "") && (messageID != "")){
             
             TripProposal proposal = new TripProposal();
             
-            proposal.setUserID(pFc.getUserID());
-            proposal.setCoord(pFc.getCoord());
+            proposal.setUserID(theUserID);
+            proposal.setCoord(theCoord);
             proposal.setMessageID(messageID);
-            proposal.setDate(pFc.getDate());
+            proposal.setDate(theDate);
             
-            status = new Gson().toJson(proposal);
+            message = new Gson().toJson(proposal);
         }
+       
+        
+        try{
+            Connection connection = RabbitMQConnection.getConnection();
+            if(connection != null){
+                Channel channel = connection.createChannel();
+                channel.basicPublish(Fanout_EXCHANGE_NAME, 
+                    "", // This parameter is used for the routing key, which is usually used for direct or topic queues.
+                    new AMQP.BasicProperties.Builder()
+                        .contentType("text/plain")
+                        .deliveryMode(2)
+                        .priority(1)
+                        //.expiration("60000")
+                        .build(),
+                    message.getBytes(StandardCharsets.UTF_8));
+            //System.out.println(" [x] Sent '" + "" + ":" + message + "'");
+                channel.close();
+                connection.close();
+            }
             
-
+        }catch (Exception e){
+            
+        }
             
 
             
@@ -236,7 +248,7 @@ public class TravelServices {
         //JSONObject jsonobj = new JSONObject(coord);
         //String longitude = jsonobj.getBigDecimal("longitude").toString();
         
-        return status;        
+        return message;        
     }
     
     
