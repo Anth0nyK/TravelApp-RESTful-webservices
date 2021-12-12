@@ -35,6 +35,10 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.GetResponse;
 import java.math.BigDecimal;
 
 import java.nio.charset.StandardCharsets;
@@ -62,42 +66,42 @@ public class TravelServices {
     }
 
     public String generateUUID() throws MalformedURLException, ProtocolException, UnsupportedEncodingException, IOException{
-        String UUID = "null";
+        String UUID = null;
         
         try{
-         String query = "https://api.random.org/json-rpc/1/invoke";
-        String jsonBody = "{\"jsonrpc\":\"2.0\",\"method\":\"generateUUIDs\",\"params\":{\"apiKey\":\"b170a05d-268a-436b-b9e1-ce1a463ea38a\",\"n\":1},\"id\":0}";
-        
-        URL url = new URL(query);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(5000);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        
-        OutputStream os = connection.getOutputStream();
-        os.write(jsonBody.getBytes("UTF-8"));
-        os.close();
-        
-        BufferedReader bfreader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder result = new StringBuilder();
-        String line;
-        
-        
-        while ((line = bfreader.readLine()) != null) {
-             System.out.println(line);
-             result.append(line);
-        }
-        
-        bfreader.close();
-        
-        //Turn the string into JSONObject for further action
-        JSONObject jsonobj = new JSONObject(result.toString());
-        //Get the needed part, the UUID, from the json in String format
-        UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
-        
-        
+            String query = "https://api.random.org/json-rpc/1/invoke";
+            String jsonBody = "{\"jsonrpc\":\"2.0\",\"method\":\"generateUUIDs\",\"params\":{\"apiKey\":\"b170a05d-268a-436b-b9e1-ce1a463ea38a\",\"n\":1},\"id\":0}";
+
+            URL url = new URL(query);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+
+            OutputStream os = connection.getOutputStream();
+            os.write(jsonBody.getBytes("UTF-8"));
+            os.close();
+
+            BufferedReader bfreader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder result = new StringBuilder();
+            String line;
+
+
+            while ((line = bfreader.readLine()) != null) {
+                 System.out.println(line);
+                 result.append(line);
+            }
+
+            bfreader.close();
+
+            //Turn the string into JSONObject for further action
+            JSONObject jsonobj = new JSONObject(result.toString());
+            //Get the needed part, the UUID, from the json in String format
+            UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
+
+
         }
         catch(IOException e){
         };
@@ -140,9 +144,30 @@ public class TravelServices {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/")
-    public String getqueryJson() {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    public String getqueryJson(@QueryParam("userID")String userID) throws IOException {
+        String proposal = "";
+        
+        try{
+            Connection connection = RabbitMQConnection.getConnection();
+            if(connection != null){
+                Channel channel = connection.createChannel();
+                channel.exchangeDeclare(Fanout_EXCHANGE_NAME,"fanout");
+                channel.queueDeclare(userID,true,false,false,null);
+                GetResponse response = channel.basicGet(userID,true);
+                
+                if(response != null){
+                    proposal = new String(response.getBody());
+                }
+                channel.close();
+                connection.close();
+            }
+            
+        }catch(Exception e){
+            
+        }
+        
+        
+        return proposal;
     }
 
 
@@ -172,37 +197,44 @@ public class TravelServices {
     
     
     @POST
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/submit/")
-    public String postProposal(proposalFromClient pFc) throws IOException {
+    public String postProposal(String pFc) throws IOException {
         String status = "Incorrect JSON format";
         String messageID = "";
         messageID = generateUUID();
         
+        String message = null;
+        
         String theUserID = null;
-        coordinates theCoord = null;
         BigDecimal theLat = null;
         BigDecimal theLong = null;
         String theDate = null;
         
-        String message = "";
+        
+        
+        
+        
         
         try{
-            theUserID = pFc.getUserID();
-            theCoord = pFc.getCoord();
-            theLat = theCoord.getlat();
-            theLong = theCoord.getlong();
-            theDate = pFc.getDate();
-            
-        }catch(NullPointerException e){
+            JSONObject obj = new JSONObject(pFc);
+            theUserID = obj.getString("userID");
+            theLat = obj.getJSONObject("place").getBigDecimal("latitude");
+            theLong = obj.getJSONObject("place").getBigDecimal("longitude");
+            theDate = obj.getString("date");
+            message = theLong.toString();
+        }catch(Exception e){
             
         }
         
         
-        if((theUserID != null) && (theLat != null) && (theLong != null) && (theDate != "") && (messageID != "")){
+        if((theUserID != null) && (theLat != null) && (theLong != null) && (theDate != null) && (messageID != "")){
             
             TripProposal proposal = new TripProposal();
+            coordinates theCoord = new coordinates();
+            theCoord.setlat(theLat);
+            theCoord.setlong(theLong);
             
             proposal.setUserID(theUserID);
             proposal.setCoord(theCoord);
@@ -210,7 +242,13 @@ public class TravelServices {
             proposal.setDate(theDate);
             
             message = new Gson().toJson(proposal);
+            
         }
+        else{
+            return message = "Wrong JSON format";
+        }
+                
+      
        
         
         try{
@@ -235,21 +273,113 @@ public class TravelServices {
             
         }
             
-
             
             
-            
-            
-            
-            //status = pFc.getCoord().getlong().toString();
+        //status = pFc.getCoord().getlong().toString();
         
         
         
         //JSONObject jsonobj = new JSONObject(coord);
         //String longitude = jsonobj.getBigDecimal("longitude").toString();
         
+        
+        
+        
         return message;        
     }
+    
+    
+    
+    
+    
+    
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/submitIntent/")
+    public String sendIntent(String intent) throws IOException {
+        String status = "Incorrect JSON format";
+        String messageID = "";
+        messageID = generateUUID();
+        
+        String message = null;
+        
+        String theSenderID = null;
+        String theReceiverID = null;
+        String theMessageID = null;
+        String theProposalID  = null;
+        
+        
+        
+        
+        
+        try{
+            JSONObject obj = new JSONObject(intent);
+            theSenderID = obj.getString("senderID");
+            theReceiverID = obj.getString("receiverID");
+            theMessageID = obj.getString("messageID");
+            theProposalID = obj.getString("proposalID");
+            //message = theProposalID;
+        }catch(Exception e){
+            
+        }
+        
+        
+        if((theSenderID != null) && (theReceiverID != null) && (theMessageID != null) && (theProposalID != null)){
+            
+            TripProposal proposal = new TripProposal();
+
+            
+            
+            
+            message = new Gson().toJson(proposal);
+            
+        }
+        else{
+            return message = "Wrong JSON format";
+        }
+                
+      
+       
+        
+        try{
+            Connection connection = RabbitMQConnection.getConnection();
+            if(connection != null){
+                Channel channel = connection.createChannel();
+                channel.basicPublish(Fanout_EXCHANGE_NAME, 
+                    "", // This parameter is used for the routing key, which is usually used for direct or topic queues.
+                    new AMQP.BasicProperties.Builder()
+                        .contentType("text/plain")
+                        .deliveryMode(2)
+                        .priority(1)
+                        //.expiration("60000")
+                        .build(),
+                    message.getBytes(StandardCharsets.UTF_8));
+            //System.out.println(" [x] Sent '" + "" + ":" + message + "'");
+                channel.close();
+                connection.close();
+            }
+            
+        }catch (Exception e){
+            
+        }
+            
+            
+            
+        //status = pFc.getCoord().getlong().toString();
+        
+        
+        
+        //JSONObject jsonobj = new JSONObject(coord);
+        //String longitude = jsonobj.getBigDecimal("longitude").toString();
+        
+        
+        
+        
+        return message;        
+    }
+    
+    
     
     
     
