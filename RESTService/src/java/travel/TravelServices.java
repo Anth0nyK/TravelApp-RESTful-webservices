@@ -42,6 +42,8 @@ import com.rabbitmq.client.GetResponse;
 import java.math.BigDecimal;
 
 import java.nio.charset.StandardCharsets;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 
 /**
@@ -114,6 +116,8 @@ public class TravelServices {
      * Retrieves representation of an instance of travel.TravelServices
      * @return an instance of java.lang.String
      */
+    //@PermitAll
+    @RolesAllowed("ADMIN")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/generateUserID/")
@@ -140,7 +144,7 @@ public class TravelServices {
     
     
     
-    
+    @RolesAllowed({"TEST","TEST2","ADMIN"})
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/")
