@@ -27,7 +27,7 @@ import org.glassfish.jersey.internal.util.Base64;
  
 /**
  * This filter verify the access permissions for a user
- * based on username and passowrd provided in request
+ * based on username and password provided in request
  * */
 @Provider
 public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequestFilter

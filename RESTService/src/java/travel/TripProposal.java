@@ -19,10 +19,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TripProposal {
     @XmlElement private String userID;
-    @XmlElement private coordinates place;
+    @XmlElement private coordinates location;
     @XmlElement private String messageID;
     @XmlElement private String date;
-    
+    @XmlElement private String weather;
     
     
     public String getUserID(){
@@ -36,11 +36,11 @@ public class TripProposal {
     
     
     public coordinates getCoord(){
-        return place;
+        return location;
     }
     
     public void setCoord(coordinates theCoord){
-        this.place = theCoord;
+        this.location = theCoord;
     }
     
     
@@ -59,10 +59,20 @@ public class TripProposal {
         return date;
     }
     
+    
+    
     public void setDate(String theDate){
         this.date = theDate;
     }
  
+    
+    public String getWeather(){
+        return weather;
+    }
+    
+    public void setWeather(String theWeather){
+        this.weather = theWeather;
+    }
     
     
     public TripProposal(){

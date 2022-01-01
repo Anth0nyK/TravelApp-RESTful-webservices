@@ -45,6 +45,11 @@ import java.nio.charset.StandardCharsets;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import java.io.File; 
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;  
+import java.util.Scanner;
 
 /**
  * REST Web Service
@@ -67,73 +72,107 @@ public class TravelServices {
     public TravelServices() {
     }
 
-    public String generateUUID() throws MalformedURLException, ProtocolException, UnsupportedEncodingException, IOException{
-        String UUID = null;
-        
-        try{
-            String query = "https://api.random.org/json-rpc/1/invoke";
-            String jsonBody = "{\"jsonrpc\":\"2.0\",\"method\":\"generateUUIDs\",\"params\":{\"apiKey\":\"b170a05d-268a-436b-b9e1-ce1a463ea38a\",\"n\":1},\"id\":0}";
 
-            URL url = new URL(query);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestMethod("POST");
-
-            OutputStream os = connection.getOutputStream();
-            os.write(jsonBody.getBytes("UTF-8"));
-            os.close();
-
-            BufferedReader bfreader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder result = new StringBuilder();
-            String line;
-
-
-            while ((line = bfreader.readLine()) != null) {
-                 System.out.println(line);
-                 result.append(line);
-            }
-
-            bfreader.close();
-
-            //Turn the string into JSONObject for further action
-            JSONObject jsonobj = new JSONObject(result.toString());
-            //Get the needed part, the UUID, from the json in String format
-            UUID = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
-
-
-        }
-        catch(IOException e){
-        };
-        
-        
-        return UUID;
-    }
     
     /**
      * Retrieves representation of an instance of travel.TravelServices
      * @return an instance of java.lang.String
      */
     //@PermitAll
-    @RolesAllowed("ADMIN")
-    @GET
+    //@RolesAllowed("ADMIN")
+    //@GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/generateUserID/")
-    public String getUserID() throws MalformedURLException, IOException {
-       
-        String TheUserID = generateUUID();
-        if(TheUserID != "null"){
-            DirectExchangeBinder DirectBinder = new DirectExchangeBinder();
-            DirectBinder.createExchangeAndQueue(Direct_EXCHANGE_NAME, TheUserID);
-
-            FanoutExchangeBinder FanoutBinder = new FanoutExchangeBinder();
-            FanoutBinder.createExchangeAndQueue(Fanout_EXCHANGE_NAME, TheUserID);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/createAccount/")
+    public String getUserID(String user) throws MalformedURLException, IOException {
+        RandomAPI random = new RandomAPI();
+        String TheUserID = random.generateUUID();
+        //System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        String UsersDirName = "userPW";
+        String IDDirName = "userUUID";
+        String TokenDirName = "tokens";
+        
+        String userName = null;
+        String userPW = null;
+        
+        try{
+            JSONObject obj = new JSONObject(user);
+            userName = obj.getString("userName");
+            userPW = obj.getString("userPW");
+            
+            
+        }catch(Exception e){
+            
         }
+        
+        
+        if((userName != null) && (userPW != null)){
+            
+            try {
+                //Make a folder to hold user account and password
+                File dir = new File(UsersDirName);
+                if (dir.exists()) {
+                    //System.out.println("dir already exists");
+                }
+                if (dir.mkdirs()) {
+                    //System.out.println(dir);
+                }
+
+
+                File myObj = new File(UsersDirName, userName + ".txt");
+                if (myObj.createNewFile()) {
+                    
+                    System.out.println("File created: " + myObj.getName());
+                    FileWriter myWriter = new FileWriter(myObj);
+                    myWriter.write(userPW);
+                    myWriter.close();
+                    //System.out.println("Successfully wrote to the file.");
+                
+                } else {
+                    //return myObj.getName().replaceFirst("[.][^.]+$", "");
+                    return "User name already exists. Please choose another one.";
+                    //System.out.println("File already exists.");
+                }
+                
+                
+              } catch (IOException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
+                return "An error occured.";
+            }
+            
+        }
+        else{
+            return "Wrong JSON format";
+        }
+        
+        
+//         try {
+//            File myObj = new File(UsersDirName, userName + ".txt");
+//            Scanner myReader = new Scanner(myObj);
+//            while (myReader.hasNextLine()) {
+//              String data = myReader.nextLine();
+//              System.out.println(data);
+//              return data;
+//            }
+//            myReader.close();
+//        } catch (FileNotFoundException e) {
+//            System.out.println("An error occurred.");
+//            e.printStackTrace();
+//        }
+
+//        if(TheUserID != "null"){
+//            DirectExchangeBinder DirectBinder = new DirectExchangeBinder();
+//            DirectBinder.createExchangeAndQueue(Direct_EXCHANGE_NAME, TheUserID+"D");
+//
+//            FanoutExchangeBinder FanoutBinder = new FanoutExchangeBinder();
+//            FanoutBinder.createExchangeAndQueue(Fanout_EXCHANGE_NAME, TheUserID+"F");
+//        }
 
         
-        return TheUserID;
+        //return TheUserID;
+        return "Account created";
     }
    
   
@@ -144,7 +183,7 @@ public class TravelServices {
     
     
     
-    @RolesAllowed({"TEST","TEST2","ADMIN"})
+    //@RolesAllowed({"TEST","TEST2","ADMIN"})
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/")
@@ -155,9 +194,9 @@ public class TravelServices {
             Connection connection = RabbitMQConnection.getConnection();
             if(connection != null){
                 Channel channel = connection.createChannel();
-                channel.exchangeDeclare(Fanout_EXCHANGE_NAME,"fanout");
-                channel.queueDeclare(userID,true,false,false,null);
-                GetResponse response = channel.basicGet(userID,true);
+                //channel.exchangeDeclare(Fanout_EXCHANGE_NAME,"fanout");
+                //channel.queueDeclare(userID+"F",true,false,false,null);
+                GetResponse response = channel.basicGet(userID+"F",true);
                 
                 if(response != null){
                     proposal = new String(response.getBody());
@@ -207,7 +246,8 @@ public class TravelServices {
     public String postProposal(String pFc) throws IOException {
         String status = "Incorrect JSON format";
         String messageID = "";
-        messageID = generateUUID();
+        RandomAPI random = new RandomAPI();
+        messageID = random.generateUUID();
         
         String message = null;
         
@@ -215,7 +255,7 @@ public class TravelServices {
         BigDecimal theLat = null;
         BigDecimal theLong = null;
         String theDate = null;
-        
+        String theWeather = null;
         
         
         
@@ -228,12 +268,16 @@ public class TravelServices {
             theLong = obj.getJSONObject("place").getBigDecimal("longitude");
             theDate = obj.getString("date");
             message = theLong.toString();
+            
+            WeatherAPI weather = new WeatherAPI();
+            theWeather = weather.getWeather(theLat.toString(), theLong.toString(), theDate);
+            
         }catch(Exception e){
             
         }
         
         
-        if((theUserID != null) && (theLat != null) && (theLong != null) && (theDate != null) && (messageID != "")){
+        if((theUserID != null) && (theLat != null) && (theLong != null) && (theDate != null) && (messageID != "") && theWeather != null){
             
             TripProposal proposal = new TripProposal();
             coordinates theCoord = new coordinates();
@@ -244,6 +288,7 @@ public class TravelServices {
             proposal.setCoord(theCoord);
             proposal.setMessageID(messageID);
             proposal.setDate(theDate);
+            proposal.setWeather(theWeather);
             
             message = new Gson().toJson(proposal);
             
@@ -304,7 +349,9 @@ public class TravelServices {
     public String sendIntent(String intent) throws IOException {
         String status = "Incorrect JSON format";
         String messageID = "";
-        messageID = generateUUID();
+        
+        RandomAPI random = new RandomAPI();
+        messageID = random.generateUUID();
         
         String message = null;
         
@@ -321,7 +368,8 @@ public class TravelServices {
             JSONObject obj = new JSONObject(intent);
             theSenderID = obj.getString("senderID");
             theReceiverID = obj.getString("receiverID");
-            theMessageID = obj.getString("messageID");
+            //theMessageID = obj.getString("messageID");
+            theMessageID = messageID;
             theProposalID = obj.getString("proposalID");
             //message = theProposalID;
         }catch(Exception e){
@@ -331,12 +379,15 @@ public class TravelServices {
         
         if((theSenderID != null) && (theReceiverID != null) && (theMessageID != null) && (theProposalID != null)){
             
-            TripProposal proposal = new TripProposal();
-
+            //TripProposal proposal = new TripProposal();
+            TripIntent TripIntent = new TripIntent();
             
+            TripIntent.setproposalID(theProposalID);
+            TripIntent.setsenderID(theSenderID);
+            TripIntent.setreceiverID(theReceiverID);
+            TripIntent.setmessageID(theMessageID);
             
-            
-            message = new Gson().toJson(proposal);
+            message = new Gson().toJson(TripIntent);
             
         }
         else{
@@ -350,8 +401,8 @@ public class TravelServices {
             Connection connection = RabbitMQConnection.getConnection();
             if(connection != null){
                 Channel channel = connection.createChannel();
-                channel.basicPublish(Fanout_EXCHANGE_NAME, 
-                    "", // This parameter is used for the routing key, which is usually used for direct or topic queues.
+                channel.basicPublish(Direct_EXCHANGE_NAME, 
+                    theReceiverID+"D", // This parameter is used for the routing key, which is usually used for direct or topic queues.
                     new AMQP.BasicProperties.Builder()
                         .contentType("text/plain")
                         .deliveryMode(2)
@@ -381,6 +432,40 @@ public class TravelServices {
         
         
         return message;        
+    }
+    
+    
+    
+    
+    
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/getIntent/")
+    public String getIntentJson(@QueryParam("userID")String userID) throws IOException {
+        String intent = "";
+        
+        try{
+            Connection connection = RabbitMQConnection.getConnection();
+            if(connection != null){
+                Channel channel = connection.createChannel();
+                //channel.exchangeDeclare(Fanout_EXCHANGE_NAME,"fanout");
+                //channel.queueDeclare(userID+"F",true,false,false,null);
+                GetResponse response = channel.basicGet(userID+"D",true);
+                
+                if(response != null){
+                    intent = new String(response.getBody());
+                }
+                channel.close();
+                connection.close();
+            }
+            
+        }catch(Exception e){
+            
+        }
+        
+        
+        return intent;
     }
     
     

@@ -40,11 +40,11 @@ public class TripIntent {
     
     
     
-    public String getreiverID(){
+    public String getreceiverID(){
         return receiverID;
     }
     
-    public void setreicerID(String theReceiverID){
+    public void setreceiverID(String theReceiverID){
         this.receiverID = theReceiverID;
     }
     

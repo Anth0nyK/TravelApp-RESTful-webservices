@@ -17,14 +17,22 @@ import org.json.JSONObject;
  *
  * @author Anthony
  */
+
 public class WeatherAPI {
     
-    public String getWeather(){
+    public String getWeather(String lat, String lon, String date){
         String output = null;
-        String coord = "51.509865,-0.118092";
+        //String coord = "51.509865,-0.118092";
+        //String date = "2022-1-1"; 
+        String coord = lat + "," + lon; 
+        
+        String weatherDay = "";
+        String tempDay = "";
+        String weatherNight = "";
+        String tempNight = "";
         
         try{
-            URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + coord + "&format=json&date=2021-12-31&cc=no&mca=no&fx24=no&tp=6");
+            URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + coord + "&format=json&date=" + date + "&cc=no&mca=no&fx24=no&tp=6");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             
@@ -38,13 +46,22 @@ public class WeatherAPI {
                 content.append(inputLine);
             }
             in.close();
-
+            
+            
             //Turn the string into JSONObject for further action
             JSONObject jsonobj = new JSONObject(content.toString());
             //Get the needed part, the UUID, from the json in String format
             //output = jsonobj.getJSONObject("result").getJSONObject("random").getJSONArray("data").getString(0);
-            output = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(0).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
+            weatherDay = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(2).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
+            tempDay = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(2).getString("tempC");
+            weatherNight = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(3).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
+            tempNight = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(3).getString("tempC");
             
+            if((weatherDay == "") && (tempDay == "") && (weatherNight == "") && tempNight == ""){
+                return null;
+            }
+            
+            output = "Day: " + tempDay + "°C" + ", " + weatherDay + ", Night: " + tempNight + "°C" + ", " + weatherNight ;
         }
         catch(IOException e){
         };

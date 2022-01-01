@@ -31,6 +31,7 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(math.MathOperations.class);
         resources.add(test.testjson.class);
+        //resources.add(travel.AuthenticationFilter.class);
         resources.add(travel.AuthenticationFilter.class);
         resources.add(travel.TravelServices.class);
     }

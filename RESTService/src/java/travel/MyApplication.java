@@ -18,6 +18,6 @@ public class MyApplication extends ResourceConfig {
     public MyApplication(){
         packages("travel");
         
-        register(AuthenticationFilter.class);
+       // register(AuthenticationFilter.class);
     }
 }
