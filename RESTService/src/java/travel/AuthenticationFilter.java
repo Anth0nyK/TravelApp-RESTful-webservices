@@ -6,10 +6,15 @@
 package travel;
 
  
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
  
@@ -101,29 +106,51 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
     private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet)
     {
         boolean isAllowed = false;
-          
-        //Step 1. Fetch password from database and match with password in argument
-        //If both match then get the defined role for user from database and continue; else return isAllowed [false]
-        //Access the database and do this part yourself
-        //String userRole = userMgr.getUserRole(username);
-         
-        if(username.equals("howtodoinjava") && password.equals("password"))
+        String UsersDirName = "userPW";
+        //File pwFile = new File(UsersDirName, username + ".txt");
+        String pwInFile = null;
+        boolean accountExist = false;
+        if(username.equals("admin") && password.equals("admin"))
         {
-            String userRole = "ADMIN";
-             
-            //Step 2. Verify user role
-            if(rolesSet.contains(userRole))
-            {
-                isAllowed = true;
-            }
-            
-            /*
-            for (String s : rolesSet) {
-                System.out.println(s);
-            }
-            */
+            String userRole = "admin";
+            isAllowed = true;
+//            //Verify user role
+//            if(rolesSet.contains(userRole)){
+//                isAllowed = true;
+//            }
             
         }
+        
+        try {
+            File myObj = new File(UsersDirName, username + ".txt");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+              pwInFile = myReader.nextLine();
+              System.out.println(pwInFile);
+         }
+        
+        myReader.close();
+
+         //System.out.println(pwInFile);
+         //System.out.println(userPW);
+         if(password.equals(pwInFile)){
+             accountExist = true;
+         }
+
+        } catch (FileNotFoundException e) {
+            //System.out.println("An error occurred.");
+            //e.printStackTrace();
+        }
+        
+        if(accountExist == true){
+            String userRole = "user";
+
+            if(rolesSet.contains(userRole)){
+                isAllowed = true;
+            }
+        }
+
+        
         return isAllowed;
     }
 }

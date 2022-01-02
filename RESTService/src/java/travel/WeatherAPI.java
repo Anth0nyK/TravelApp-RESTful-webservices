@@ -20,19 +20,20 @@ import org.json.JSONObject;
 
 public class WeatherAPI {
     
-    public String getWeather(String lat, String lon, String date){
+    public String getWeather(String location, String date){
         String output = null;
         //String coord = "51.509865,-0.118092";
         //String date = "2022-1-1"; 
-        String coord = lat + "," + lon; 
+        //String coord = lat + "," + lon; 
         
-        String weatherDay = "";
-        String tempDay = "";
-        String weatherNight = "";
-        String tempNight = "";
+        String weatherDay = null;
+        String tempDay = null;
+        String weatherNight = null;
+        String tempNight = null;
         
         try{
-            URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + coord + "&format=json&date=" + date + "&cc=no&mca=no&fx24=no&tp=6");
+            URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + location + "&format=json&num_of_days=1&date=" + date + "&cc=no&mca=no&fx24=no&tp=6");
+            //URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + coord + "&format=json&date=" + date + "&cc=no&mca=no&fx24=no&tp=6");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             
@@ -57,15 +58,14 @@ public class WeatherAPI {
             weatherNight = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(3).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
             tempNight = jsonobj.getJSONObject("data").getJSONArray("weather").getJSONObject(0).getJSONArray("hourly").getJSONObject(3).getString("tempC");
             
-            if((weatherDay == "") && (tempDay == "") && (weatherNight == "") && tempNight == ""){
-                return null;
-            }
-            
-            output = "Day: " + tempDay + "°C" + ", " + weatherDay + ", Night: " + tempNight + "°C" + ", " + weatherNight ;
+
         }
-        catch(IOException e){
+        catch(Exception e){
+            return null;
         };
-        
+       
+            
+        output = "Day: " + tempDay + "°C" + ", " + weatherDay + ", Night: " + tempNight + "°C" + ", " + weatherNight ;
         
         return output;
     }

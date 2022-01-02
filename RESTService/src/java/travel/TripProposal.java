@@ -19,7 +19,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TripProposal {
     @XmlElement private String userID;
-    @XmlElement private coordinates location;
+    //@XmlElement private coordinates location;
+    @XmlElement private String title;
+    @XmlElement private String location;
     @XmlElement private String messageID;
     @XmlElement private String date;
     @XmlElement private String weather;
@@ -34,15 +36,31 @@ public class TripProposal {
     }
     
     
+    public String getTitle(){
+        return title;
+    }
     
-    public coordinates getCoord(){
+    public void setTitle(String theTitle){
+        this.title = theTitle;
+    }
+    
+    
+    public String getLocation(){
         return location;
     }
     
-    public void setCoord(coordinates theCoord){
-        this.location = theCoord;
+    public void setLocation(String location){
+        this.location = location;
     }
     
+//    public coordinates getCoord(){
+//        return location;
+//    }
+//    
+//    public void setCoord(coordinates theCoord){
+//        this.location = theCoord;
+//    }
+//    
     
     
     public String getMessageID(){

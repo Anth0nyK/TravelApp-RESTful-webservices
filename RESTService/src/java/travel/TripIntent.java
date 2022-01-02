@@ -25,8 +25,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TripIntent {
     @XmlElement private String senderID;
     @XmlElement private String receiverID;
+    @XmlElement private String message;
     @XmlElement private String messageID;
-    @XmlElement private String proposalID;
+    //@XmlElement private String proposalID;
     
     
     public String getsenderID(){
@@ -62,14 +63,21 @@ public class TripIntent {
     
     
     
-    public String getproposalID(){
-        return proposalID;
+//    public String getproposalID(){
+//        return proposalID;
+//    }
+//    
+//    public void setproposalID(String theProposalID){
+//        this.proposalID = theProposalID;
+//    }
+//    
+    public String getmessage(){
+        return message;
     }
     
-    public void setproposalID(String theProposalID){
-        this.proposalID = theProposalID;
+    public void setMessage(String theMessage){
+        this.message = theMessage;
     }
-    
     
 
 }

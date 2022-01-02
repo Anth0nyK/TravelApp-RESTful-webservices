@@ -60,7 +60,8 @@ public class RandomAPI {
 
 
         }
-        catch(IOException e){
+        catch(Exception e){
+            return null;
         };
         
         
