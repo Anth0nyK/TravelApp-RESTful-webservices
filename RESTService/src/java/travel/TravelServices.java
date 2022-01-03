@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;  
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -108,7 +109,7 @@ public class TravelServices {
         
         try{
             JSONObject obj = new JSONObject(user);
-            userName = obj.getString("userName");
+            userName = obj.getString("username");
             userPW = obj.getString("userPW");
             
             
@@ -791,6 +792,9 @@ public class TravelServices {
             TripIntent.setsenderID(theSenderID);
             TripIntent.setreceiverID(theReceiverID);
             TripIntent.setmessageID(theMessageID);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date();
+            TripIntent.setDate(dateFormat.format(date));
             
             message = new Gson().toJson(TripIntent);
             

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package travel;
+package travelapp;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,16 +15,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Anthony
  */
 
-@XmlRootElement(name="TripProposal")
-@XmlAccessorType(XmlAccessType.FIELD)
+
 public class TripProposal {
-    @XmlElement private String userID;
+    private String userID;
     //@XmlElement private coordinates location;
-    @XmlElement private String title;
-    @XmlElement private String date;
-    @XmlElement private String weather;
-    @XmlElement private String location;
-    @XmlElement private String messageID;
+    private String title;
+    private String location;
+    private String messageID;
+    private String date;
+    private String weather;
     
     
     public String getUserID(){

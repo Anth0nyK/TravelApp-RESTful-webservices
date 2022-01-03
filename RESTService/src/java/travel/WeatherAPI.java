@@ -32,8 +32,9 @@ public class WeatherAPI {
         String tempNight = null;
         
         try{
-            URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + location + "&format=json&num_of_days=1&date=" + date + "&cc=no&mca=no&fx24=no&tp=6");
+            URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + location + "&format=json&num_of_days=1&date=" + date + "&cc=no&mca=no&fx24=yes&tp=6");
             //URL url = new URL("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=dcf1d98034d14a32b35202955213012&q=" + coord + "&format=json&date=" + date + "&cc=no&mca=no&fx24=no&tp=6");
+            
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             
@@ -64,8 +65,8 @@ public class WeatherAPI {
             return null;
         };
        
-            
-        output = "Day: " + tempDay + "°C" + ", " + weatherDay + ", Night: " + tempNight + "°C" + ", " + weatherNight ;
+        //°    
+        output = "Day: " + tempDay + "C" + ", " + weatherDay + ", Night: " + tempNight + "C" + ", " + weatherNight ;
         
         return output;
     }
