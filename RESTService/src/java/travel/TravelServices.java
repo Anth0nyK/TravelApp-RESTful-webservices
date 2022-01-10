@@ -70,8 +70,10 @@ import org.glassfish.jersey.internal.util.Base64;
 @Path("travelProposal")
 public class TravelServices {
 
-    private final static String Direct_EXCHANGE_NAME = "testDirect";
-    private final static String Fanout_EXCHANGE_NAME = "testFanout";
+//    private final static String Direct_EXCHANGE_NAME = "testDirect";
+//    private final static String Fanout_EXCHANGE_NAME = "testFanout";
+    private final static String Direct_EXCHANGE_NAME = "TRAVEL_INTENT";
+    private final static String Fanout_EXCHANGE_NAME = "TRAVEL_OFFERS";
     
     @Context
     private UriInfo context;
@@ -169,6 +171,7 @@ public class TravelServices {
                     TheUserID = random.generateUUID();
                     if(TheUserID == null){
                         return "random API is offline. Please try again later";
+                        
                     }
                     FileWriter uuidWriter = new FileWriter(uuidFile);
                     uuidWriter.write(TheUserID);
@@ -330,7 +333,8 @@ public class TravelServices {
     @RolesAllowed("user")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/query/")
+    //@Path("/query/")
+    @Path("proposal")
     public String getqueryJson(@Context HttpHeaders httpHeaders, @QueryParam("userID")String userID) throws IOException {
         
         String auth = httpHeaders.getRequestHeader("Authorization").get(0);
@@ -346,7 +350,8 @@ public class TravelServices {
         final String password = tokenizer.nextToken();
         
         if(userID.equals(username) == false){
-            return "Usernames in Auth and request body are not the same. Action denied.";
+            //return "Usernames in Auth and request body are not the same. Action denied.";
+            return "{\"error\":\"Usernames in Auth and request body are not the same. Action denied.\"}";
         }
         
         String proposal = "";
@@ -364,7 +369,8 @@ public class TravelServices {
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            return "Receiver does not exist. Please double check the username";
+            //return "Receiver does not exist. Please double check the username";
+            return "{\"error\":\"Receiver does not exist. Please double check the username.\"}";
         }
         
         try{
@@ -383,7 +389,8 @@ public class TravelServices {
             }
             
         }catch(Exception e){
-            return "rabbitMQ offline. Please try it again later.";
+            //return "rabbitMQ offline. Please try it again later.";
+            return "{\"error\":\"rabbitMQ offline. Please try it again later.\"}";
         }
         
         
@@ -419,7 +426,8 @@ public class TravelServices {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/submitProposal/")
+    //@Path("/submitProposal/")
+    @Path("proposal")
     public String postProposal(@Context HttpHeaders httpHeaders, String pFc) throws IOException {
         
         String auth = httpHeaders.getRequestHeader("Authorization").get(0);
@@ -468,12 +476,14 @@ public class TravelServices {
             //theToken = obj.getString("token");
             
         }catch(Exception e){
-            return "Incorrect JSON format.";
+            //return "Incorrect JSON format.";
+            return "{\"error\":\"Incorrect JSON format.\"}";
         }
         
         
         if(theUserID.equals(username) == false){
-            return "Usernames in Auth and request body are not the same. Action denied.";
+            //return "Usernames in Auth and request body are not the same. Action denied.";
+            return "{\"error\":\"Usernames in Auth and request body are not the same. Action denied.\"}";
         }
         
         
@@ -504,7 +514,8 @@ public class TravelServices {
         if((theUserID.isEmpty() == false) && (theTitle.isEmpty() == false) && (theDate.isEmpty() == false) && (thePlace.isEmpty() == false)){    
 
             if(theDate.matches(regex) == false){
-                return "Incorrect date format. Should be in YYYY-MM-DD";
+                //return "Incorrect date format. Should be in YYYY-MM-DD";
+                return "{\"error\":\"Incorrect date format. Should be in YYYY-MM-DD.\"}";
             }
 
             try{
@@ -526,10 +537,12 @@ public class TravelServices {
                 long days = ChronoUnit.DAYS.between(from, to);    // 6 days
 
                 if(days > 14){
-                    return "Cannot submit a proposal with a trip date more than 14 days in the future.";
+                    //return "Cannot submit a proposal with a trip date more than 14 days in the future.";
+                    return "{\"error\":\"Cannot submit a proposal with a trip date more than 14 days in the future.\"}";
                 }
                 else if(days < 0){
-                    return "Cannot submit a proposal with a trip date before today.";
+                    //return "Cannot submit a proposal with a trip date before today.";
+                    return "{\"error\":\"Cannot submit a proposal with a trip date before today.\"}";
                 }
 
             }catch(Exception e){
@@ -538,7 +551,8 @@ public class TravelServices {
 
             messageID = random.generateUUID();
             if(messageID == null){
-                return "random API offline. Please try again later.";
+                //return "random API offline. Please try again later.";
+                return "{\"error\":\"random API offline. Please try again later.\"}";
             }
             
             
@@ -568,7 +582,8 @@ public class TravelServices {
                     if(theWeather == null){
                         cacheFile.delete();
                         dir.delete();
-                        return "The location cannot be found.";
+                        //return "The location cannot be found.";
+                        return "{\"error\":\"The location cannot be found.\"}";
                     }
                     
                     //If weather can be found, 
@@ -601,7 +616,8 @@ public class TravelServices {
               } catch (IOException e) {
                 System.out.println("An error occurred.");
                 e.printStackTrace();
-                return "An error occured.";
+                //return "An error occured.";
+                return "{\"error\":\"An error occured.\"}";
             }
             
             
@@ -626,7 +642,8 @@ public class TravelServices {
             
         }
         else{
-            return message = "Fields cannot be empty.";
+            //return message = "Fields cannot be empty.";
+            return message = "{\"error\":\"Fields cannot be empty\"}";
         }
                 
       
@@ -651,7 +668,8 @@ public class TravelServices {
             }
             
         }catch (Exception e){
-            return "rabbitMQ is offline. Please try it again later.";
+            //return "rabbitMQ is offline. Please try it again later.";
+            return "{\"error\":\"rabbitMQ is offline. Please try it again later.\"}";
         }
             
             
@@ -677,7 +695,8 @@ public class TravelServices {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/submitIntent/")
+    //@Path("/submitIntent/")
+    @Path("intent")
     public String sendIntent(@Context HttpHeaders httpHeaders, String intent) throws IOException {
         
         String auth = httpHeaders.getRequestHeader("Authorization").get(0);
@@ -726,12 +745,14 @@ public class TravelServices {
             //theToken = obj.getString("token");
             //message = theProposalID;
         }catch(Exception e){
-            return "Incorrect JSON format";
+            //return "Incorrect JSON format";
+            return message = "{\"error\":\"Incorrect JSON format.\"}";
         }
         
         //Verify if the username in the header and username in the request body is the same
         if(theSenderID.equals(username) == false){
-            return "Usernames in Auth and request body are not the same. Action denied.";
+            //return "Usernames in Auth and request body are not the same. Action denied.";
+            return message = "{\"error\":\"Usernames in Auth and request body are not the same. Action denied.\"}";
         }
         
         
@@ -769,7 +790,8 @@ public class TravelServices {
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            return "Receiver does not exist. Please double check the username";
+            //return "Receiver does not exist. Please double check the username";
+            return message = "{\"error\":\"Receiver does not exist. Please double check the username.\"}";
         }
         
         
@@ -781,7 +803,8 @@ public class TravelServices {
             
             theMessageID = random.generateUUID();
             if(theMessageID == null){
-                return "random API is offline. Please try again later.";
+                //return "random API is offline. Please try again later.";
+                return message = "{\"error\":\"random API is offline. Please try again later.\"}";
             }
             
             //TripProposal proposal = new TripProposal();
@@ -800,7 +823,8 @@ public class TravelServices {
             
         }
         else{
-            return message = "Fields cannot be empty.";
+            //return message = "Fields cannot be empty.";
+            return message = "{\"error\":\"Fields cannot be empty\"}";
         }
                 
       
@@ -828,7 +852,8 @@ public class TravelServices {
             }
             
         }catch (Exception e){
-            return "rabbitMQ is offline. Please try this again later.";
+            //return "rabbitMQ is offline. Please try this again later.";
+            return message = "{\"error\":\"rabbitMQ is offline. Please try this again later.\"}";
         }
             
             
@@ -853,7 +878,8 @@ public class TravelServices {
     @RolesAllowed("user")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/getIntent/")
+    //@Path("/getIntent/")
+    @Path("intent")
     public String getIntentJson(@Context HttpHeaders httpHeaders, @QueryParam("userID")String userID) throws IOException {
 
         String IDDirName = "userUUID";
@@ -872,7 +898,8 @@ public class TravelServices {
         
                 //Verify if the username in the header and username in the request body is the same
         if(userID.equals(username) == false){
-            return "Usernames in Auth and request body are not the same. Action denied.";
+            //return "Usernames in Auth and request body are not the same. Action denied.";
+            return "{\"error\":\"Usernames in Auth and request body are not the same. Action denied.\"}";
         }
         
         String intent = "";
@@ -889,7 +916,8 @@ public class TravelServices {
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            return "Receiver does not exist. Please double check the username";
+            //return "Receiver does not exist. Please double check the username";
+            return "{\"error\":\"Receiver does not exist. Please double check the username.\"}";
         }
         
         
@@ -909,7 +937,8 @@ public class TravelServices {
             }
             
         }catch(Exception e){
-            return "rabbitMQ is offline. Please try this later.";
+            //return "rabbitMQ is offline. Please try this later.";
+            return "{\"error\":\"rabbitMQ is offline. Please try this later.\"}";
         }
         
         

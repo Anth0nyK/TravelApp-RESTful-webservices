@@ -6,6 +6,10 @@
 package travel;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -14,6 +18,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Scanner;
 import org.json.JSONObject;
 
 /**
@@ -61,7 +67,50 @@ public class RandomAPI {
 
         }
         catch(Exception e){
-            return null;
+            boolean hasLine = false;
+            try {
+            File myObj = new File("UUIDBackup/", "UUIDBackup" + ".txt");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+              String UUIDinFile = myReader.nextLine();
+              //System.out.println(data);
+              UUID = UUIDinFile;
+              hasLine = true;
+              break;
+            }
+            myReader.close();
+            } catch (FileNotFoundException x) {
+                //return "Receiver does not exist. Please double check the username";
+                //return message = "{\"error\":\"Receiver does not exist. Please double check the username.\"}";
+            }
+            
+            if(hasLine == true){
+                File path = new File("UUIDBackup/UUIDBackup.txt");
+                Scanner scanner = new Scanner(path);
+                ArrayList<String> coll = new ArrayList<String>();
+                scanner.nextLine();
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    coll.add(line);
+                }
+
+                scanner.close();
+
+                FileWriter writer = new FileWriter(path);
+                for (String line : coll) {
+                    writer.write(line);
+                    writer.write(System.getProperty( "line.separator" ));
+                }
+
+                writer.close();
+            }
+            
+            
+            
+            if(hasLine == false){
+                return null;
+            }
+            return UUID;
         };
         
         

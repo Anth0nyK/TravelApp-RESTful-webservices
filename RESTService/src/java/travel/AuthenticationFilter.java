@@ -48,20 +48,20 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
     public void filter(ContainerRequestContext requestContext)
     {
         Method method = resourceInfo.getResourceMethod();
-        //Access allowed for all
+        //Check that if it allowed for all to access
         if( ! method.isAnnotationPresent(PermitAll.class))
         {
-            //Access denied for all
+            //If it is denied for all
             if(method.isAnnotationPresent(DenyAll.class))
             {
-                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("Access blocked for all users !!").build());                
+                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("Access blocked for all users.").build());                
                 return;
             }
               
             //Get request headers
             final MultivaluedMap<String, String> headers = requestContext.getHeaders();
               
-            //Fetch authorization header
+            //Fetch authorization header and put them into a list
             final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
               
             //If no authorization information present; block access
@@ -84,8 +84,8 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
             final String password = tokenizer.nextToken();
               
             //Verifying Username and password
-            System.out.println(username);
-            System.out.println(password);
+//            System.out.println(username);
+//            System.out.println(password);
               
             //Verify user access
             if(method.isAnnotationPresent(RolesAllowed.class))
@@ -103,6 +103,8 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
             }
         }
     }
+    
+    //Check that if the user is allowed
     private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet)
     {
         boolean isAllowed = false;
@@ -114,7 +116,7 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
         {
             String userRole = "admin";
             isAllowed = true;
-//            //Verify user role
+            //Verify user role
 //            if(rolesSet.contains(userRole)){
 //                isAllowed = true;
 //            }

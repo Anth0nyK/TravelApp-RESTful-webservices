@@ -21,7 +21,7 @@ public class FanoutExchangeBinder {
             if(connection != null){
                 Channel channel = connection.createChannel();
                 //create a direct exchange with name of String exchange
-                channel.exchangeDeclare(exchange, EXCHANGE_TYPE.FANOUT.toString().toLowerCase());
+                channel.exchangeDeclare(exchange, EXCHANGE_TYPE.FANOUT.toString().toLowerCase(), true);
                 //create a queue with name of String queue for the user
                 channel.queueDeclare(queue, true, false, false, null);
                 //bind the queue to the direct exchange for the user and use the same String as the routing key

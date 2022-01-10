@@ -66,7 +66,7 @@ public class TravelApp {
         
         while(true) {
             System.out.println("-----Main menu-----");
-            System.out.println("1: Submit porposal");
+            System.out.println("1: Submit proposal");
             System.out.println("2: Query");
             System.out.println("3: Submit intent");
             System.out.println("4: Get intent");
@@ -106,6 +106,7 @@ public class TravelApp {
                             break;
                         }
                     }
+                    break;
                     
                 case 6:
                     listIntent();
@@ -175,8 +176,14 @@ public class TravelApp {
             }
 
             bfreader.close();
-            response = result.toString();
-
+            //response = result.toString();
+            //Turn the string into JSONObject for further action
+            try{
+                JSONObject jsonobj = new JSONObject(result.toString());
+                response = jsonobj.getString("error");
+            }catch(Exception e){
+                response = result.toString();
+            }
         }
         catch(Exception e){
             response = "Travel App API is offline. Please try this again later.";
@@ -238,7 +245,16 @@ public class TravelApp {
             }
 
             bfreader.close();
-            response = result.toString();
+            //response = result.toString();
+            //Turn the string into JSONObject for further action
+            
+            //Get the needed part, the UUID, from the json in String format
+            try{
+                JSONObject jsonobj = new JSONObject(result.toString());
+                response = jsonobj.getString("error");
+            }catch(Exception e){
+                response = result.toString();
+            }
 
         }
         catch(Exception e){
@@ -295,7 +311,7 @@ public class TravelApp {
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
             
-            String query = "http://localhost:8080/RESTService/webresources/travelProposal/submitProposal/";
+            String query = "http://localhost:8080/RESTService/webresources/travelProposal/proposal/";
             String jsonBody = "{\"userID\":\"" + ac + "\",\"title\":\"" + title + "\"," + "\"place\":\"" + place + "\"," + "\"date\":\"" + date + "\"}";
 
             URL url = new URL(query);
@@ -322,8 +338,14 @@ public class TravelApp {
             }
 
             bfreader.close();
-            response = result.toString();
-
+            //response = result.toString();
+            //Turn the string into JSONObject for further action
+            try{
+                JSONObject jsonobj = new JSONObject(result.toString());
+                response = jsonobj.getString("error");
+            }catch(Exception e){
+                response = result.toString();
+            }
         }
         catch(Exception e){
             response = "Travel App API is offline. Please try this again later.";
@@ -352,7 +374,7 @@ public class TravelApp {
                 String userCredentials = ac+":"+pw;
                 String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
-                URL url = new URL("http://localhost:8080/RESTService/webresources/travelProposal/query/?userID="+ac);
+                URL url = new URL("http://localhost:8080/RESTService/webresources/travelProposal/proposal/?userID="+ac);
 
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestProperty ("Authorization", basicAuth);
@@ -383,7 +405,7 @@ public class TravelApp {
                 weather = jsonobj.getString("weather");
 
                 try {
-                    String dirName = "proposal/"+date + "/" + location.replaceAll(" ", "_").toLowerCase();;
+                    String dirName = "UserData/"+ ac + "/proposal/"+date + "/" + location.replaceAll(" ", "_").toLowerCase();;
                     //Make a folder to hold user account and password
                     File dir = new File(dirName);
                     if (dir.exists()) {
@@ -449,7 +471,7 @@ public class TravelApp {
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
             
-            String query = "http://localhost:8080/RESTService/webresources/travelProposal/submitIntent/";
+            String query = "http://localhost:8080/RESTService/webresources/travelProposal/intent/";
             String jsonBody = "{\"senderID\":\"" + ac + "\",\"receiverID\":\"" + receiverID + "\"," + "\"message\":\"" + message + "\"}";
 
             URL url = new URL(query);
@@ -476,7 +498,14 @@ public class TravelApp {
             }
 
             bfreader.close();
-            response = result.toString();
+            //response = result.toString();
+            //Turn the string into JSONObject for further action
+            try{
+                JSONObject jsonobj = new JSONObject(result.toString());
+                response = jsonobj.getString("error");
+            }catch(Exception e){
+                response = result.toString();
+            }
 
         }
         catch(Exception e){
@@ -505,7 +534,7 @@ public class TravelApp {
                 String userCredentials = ac+":"+pw;
                 String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
-                URL url = new URL("http://localhost:8080/RESTService/webresources/travelProposal/getIntent/?userID="+ac);
+                URL url = new URL("http://localhost:8080/RESTService/webresources/travelProposal/intent/?userID="+ac);
 
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestProperty ("Authorization", basicAuth);
@@ -534,7 +563,7 @@ public class TravelApp {
                 
 
                 try {
-                    String dirName = "intent/" + date;
+                    String dirName = "UserData/"+ac+"/intent/" + date;
                     //Make a folder to hold user account and password
                     File dir = new File(dirName);
                     if (dir.exists()) {
@@ -569,10 +598,10 @@ public class TravelApp {
             };
         }
         if(counter == 0){
-            System.out.println("You do not have any new proposal.");
+            System.out.println("You do not have any new intent.");
         }
         else{
-            System.out.println("You have " + counter + " new proposal(s).");
+            System.out.println("You have " + counter + " new intent(s).");
         }
         
         System.out.println("You are up-to-date now.");
@@ -587,8 +616,9 @@ public class TravelApp {
         String todayDate = dtf.format(now).toString();
         Date date1 = sdf.parse(todayDate);
         Date date2;
-        File dir = new File("proposal");
+        File dir = new File("UserData/"+ac+"/proposal/");
         File[] directoryListing = dir.listFiles();
+        int counter = 0;
         
         //Remove out dated proposals
         if (directoryListing != null) {
@@ -600,11 +630,12 @@ public class TravelApp {
             int result = date2.compareTo(date1);
             if(result < 0){
                 child.delete();
+                System.out.println("Removed the out-dated proposals");
             }
             
           }
         } else {
-          System.out.println("You do not have the data.");
+          //System.out.println("You do not have the data.");
         }
         
         //Get the proposal
@@ -628,14 +659,20 @@ public class TravelApp {
                     System.out.println("location: " + proposal.getLocation());
                     System.out.println("messageID: " + proposal.getMessageID());
                     System.out.println("----------------------------------------------------------------");
+                    counter = counter + 1;
                 }
             }
           }
         } else {
-          System.out.println("You do not have the data.");
+          //System.out.println("You do not have the data.");
         }
         
-        
+        if(counter == 0){
+            System.out.println("Do not have any proposal in the file.");
+        }
+        else{
+            System.out.println("Listed " + counter + " proposal(s).");
+        }
         
         
     }
@@ -655,7 +692,7 @@ public class TravelApp {
         String todayDate = dtf.format(now).toString();
         Date date1 = sdf.parse(todayDate);
         Date date2;
-        File dir = new File("proposal");
+        File dir = new File("UserData/"+ac+"/proposal/");
         File[] directoryListing = dir.listFiles();
         
         //Remove out dated proposals
@@ -668,11 +705,12 @@ public class TravelApp {
             int result = date2.compareTo(date1);
             if(result < 0){
                 child.delete();
+                System.out.println("Removed the out-dated proposals.");
             }
             
           }
         } else {
-          System.out.println("You do not have the data.");
+          //System.out.println("You do not have the data.");
         }
         
         //Get the proposal
@@ -710,7 +748,7 @@ public class TravelApp {
         }
         
         if(counter == 0){
-            System.out.println("Do not have the proposal on the location:");
+            System.out.println("Do not have the proposal on the location.");
         }
         else{
             System.out.println("Listed " + counter + " proposal(s) in the location:" + location );
@@ -727,7 +765,7 @@ public class TravelApp {
         String todayDate = dtf.format(now).toString();
         Date date1 = sdf.parse(todayDate);
         Date date2;
-        File dir = new File("intent");
+        File dir = new File("UserData/"+ac+"/intent/");
         File[] directoryListing = dir.listFiles();
         
         int counter = 0;
@@ -742,11 +780,12 @@ public class TravelApp {
             int result = date2.compareTo(date1);
             if(result < 0){
                 child.delete();
+                System.out.println("Removed the out-dated intents.");
             }
             
           }
         } else {
-          System.out.println("You do not have the data.");
+          //System.out.println("You do not have the data.");
         }
         
         //Get the proposal
@@ -769,6 +808,7 @@ public class TravelApp {
                     System.out.println("----------------------------------------------------------------");
                 
                     counter = counter + 1;
+                    
             }
           }
         } else {
