@@ -58,6 +58,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.core.HttpHeaders;
 import org.glassfish.jersey.internal.util.Base64;
 
@@ -93,10 +94,11 @@ public class TravelServices {
     @PermitAll
     //@RolesAllowed("ADMIN")
     //@GET
-    @POST
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/createAccount/")
+    //@Path("/createAccount/")
+    @Path("account")
     public String getUserID(String user) throws MalformedURLException, IOException {
         RandomAPI random = new RandomAPI();
         String TheUserID = null;
@@ -104,7 +106,7 @@ public class TravelServices {
         //System.out.println("Working Directory = " + System.getProperty("user.dir"));
         String UsersDirName = "userPW";
         String IDDirName = "userUUID";
-        String TokenDirName = "tokens";
+        //String TokenDirName = "tokens";
         
         String userName = null;
         String userPW = null;
@@ -948,6 +950,44 @@ public class TravelServices {
     
     
     
+    @RolesAllowed("admin")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    //@Path("/getIntent/")
+    @Path("account")
+    public String deleteUser(@Context HttpHeaders httpHeaders, String userID) throws IOException {
+
+        JSONObject obj = new JSONObject(userID);
+        String userName = obj.getString("username");
+        
+        String IDDirName = "userUUID";
+        String PWDirName = "userPW";
+        
+        String userUUID = "";
+        
+        //Delete the UUID file of the user from the folder
+        try {
+            File UUIDfile = new File(IDDirName, userName + ".txt");
+            if(!UUIDfile.delete()){
+                return "{\"error\":\"user does not exist.\"}";
+            }
+            File PWfile = new File(PWDirName, userName + ".txt");
+            if(!PWfile.delete()){
+                return "{\"error\":\"user does not exist.\"}";
+            }
+            
+        } catch (Exception e) {
+            //return "Receiver does not exist. Please double check the username";
+            return "{\"error\":\"user does not exist.\"}";
+        }
+        
+        
+
+        
+        
+        return "{\"result\":\"Successfully removed the user account with username:"
+                + userName + "\"}";
+    }
     
     
     /**

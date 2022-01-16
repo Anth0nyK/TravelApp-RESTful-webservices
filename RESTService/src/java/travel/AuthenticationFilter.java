@@ -94,7 +94,7 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
                 Set<String> rolesSet = new HashSet<String>(Arrays.asList(rolesAnnotation.value()));
                   
                 //Is user valid?
-                if( ! isUserAllowed(username, password, rolesSet))
+                if( ! isTheUserAllowed(username, password, rolesSet))
                 {
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
                         .entity("You cannot access this resource").build());
@@ -105,7 +105,7 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
     }
     
     //Check that if the user is allowed
-    private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet)
+    private boolean isTheUserAllowed(final String username, final String password, final Set<String> rolesSet)
     {
         boolean isAllowed = false;
         String UsersDirName = "userPW";
@@ -115,11 +115,11 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
         if(username.equals("admin") && password.equals("admin"))
         {
             String userRole = "admin";
-            isAllowed = true;
+            //isAllowed = true;
             //Verify user role
-//            if(rolesSet.contains(userRole)){
-//                isAllowed = true;
-//            }
+            if(rolesSet.contains(userRole)){
+                isAllowed = true;
+            }
             
         }
         

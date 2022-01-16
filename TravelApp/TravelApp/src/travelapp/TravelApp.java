@@ -564,7 +564,6 @@ public class TravelApp {
 
                 try {
                     String dirName = "UserData/"+ac+"/intent/" + date;
-                    //Make a folder to hold user account and password
                     File dir = new File(dirName);
                     if (dir.exists()) {
                         //System.out.println("dir already exists");
