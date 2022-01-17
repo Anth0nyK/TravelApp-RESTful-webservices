@@ -189,7 +189,7 @@ public class TravelServices {
 //                    tokenWriter.write(TheToken);
 //                    tokenWriter.close();
                     
-                    //System.out.println("Successfully wrote to the file.");
+//                    System.out.println("Successfully wrote to the file.");
                 
                 } else {
                     //return myObj.getName().replaceFirst("[.][^.]+$", "");
@@ -953,6 +953,7 @@ public class TravelServices {
     @RolesAllowed("admin")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     //@Path("/getIntent/")
     @Path("account")
     public String deleteUser(@Context HttpHeaders httpHeaders, String userID) throws IOException {

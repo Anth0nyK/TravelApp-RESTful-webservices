@@ -150,7 +150,7 @@ public class TravelApp {
         String response = null;
         
         try{
-            String query = "http://localhost:8080/RESTService/webresources/travelProposal/createAccount/";
+            String query = "http://localhost:8080/RESTService/webresources/travelProposal/account/";
             String jsonBody = "{\"username\":\"" + acInput + "\",\"userPW\":\"" + pwInput + "\"}";
 
             URL url = new URL(query);
@@ -159,7 +159,7 @@ public class TravelApp {
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setDoOutput(true);
             connection.setDoInput(true);
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod("PUT");
 
             OutputStream os = connection.getOutputStream();
             os.write(jsonBody.getBytes("UTF-8"));
