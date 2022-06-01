@@ -46,6 +46,6 @@ The last method is a “admin” only method. After doing the HTTP Basic authent
 </p>
 <p align="center">REST web service design diagram</p>
 
-[Back To The Top](#travel-proposal-application-restful-api)
+[Back To The Top](#travel-proposal-application-and-restful-api)
 
 ---
