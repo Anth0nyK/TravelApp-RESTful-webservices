@@ -41,8 +41,8 @@ The last method is a “admin” only method. After doing the HTTP Basic authent
 
 <p align="center">
   <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/3.png" width="550" title="design diagram">
-  <div>REST web service design diagram</div>
 </p>
+<p align="center">REST web service design diagram</p>
 
 [Back To The Top](#travel-proposal-application-restful-api)
 
