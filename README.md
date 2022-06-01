@@ -15,8 +15,9 @@
 
 This project contains a Java travel proposal application supported by a RESTful API which allows users to post, query travel proposals and submit travel intents to the trips' proposer.
 
-![App structure](https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/1.png)
-
+<p align="center">
+  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/1.png" width="350" title="App structure">
+</p>
 
 The RESTful web service was built on Java using the Jersey framework running on local Tomcat server and connected to 2 external web APIs (RANDOM.ORG and World Weather Online) and a RabbitMQ server. It has 7 methods exposed as REST methods for external clients to consume.
 
