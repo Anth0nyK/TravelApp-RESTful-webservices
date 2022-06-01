@@ -3,14 +3,6 @@
 
 ---
 
-### Table of Contents
-- [Description](#description)
-- [How To Use](#how-to-use)
-- [References](#references)
-- [Author Info](#author-info)
-
----
-
 ## Description
 
 This project contains a Java travel proposal application supported by a RESTful API which allows users to post, query travel proposals and submit travel intents to the trips' proposer.
@@ -66,16 +58,3 @@ The last method is a “admin” only method. After doing the HTTP Basic authent
 [Back To The Top](#travel-proposal-application-restful-api)
 
 ---
-
-## References
-[Back To The Top](#travel-proposal-application-restful-api)
-
----
-
-
-## Author Info
-
-- Twitter - [@jamesqquick](https://twitter.com/jamesqquick)
-- Website - [James Q Quick](https://jamesqquick.com)
-
-[Back To The Top](#travel-proposal-application-restful-api)
