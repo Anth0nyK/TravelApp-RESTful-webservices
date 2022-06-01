@@ -39,6 +39,11 @@ For the intent/GET method, it only consumes “userID” as a parameter. It allo
 
 The last method is a “admin” only method. After doing the HTTP Basic authentication, the system will be able to tell the role of the user. If the user’s role is “admin”, they will be able to use the account/DELETE method which will delete the user data from the system with the username specified.
 
+<p align="center">
+  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/3.png" width="550" title="design diagram">
+  <div>REST web service design diagram</div>
+</p>
+
 [Back To The Top](#travel-proposal-application-restful-api)
 
 ---
