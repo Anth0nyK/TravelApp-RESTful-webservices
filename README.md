@@ -41,8 +41,8 @@ The last method is a “admin” only method. After doing the HTTP Basic authent
 
 #### Technologies
 
-- Technology 1
-- Technology 2
+- Java
+- The Jersey RESTful Web Services framework
 
 [Back To The Top](#travel-proposal-application-restful-api)
 
