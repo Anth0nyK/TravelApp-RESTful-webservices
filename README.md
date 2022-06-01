@@ -14,6 +14,8 @@
 - RabbitMQ
 - Tomcat
 
+<br/>
+
 This project contains a Java travel proposal application supported by a RESTful API which allows users to post, query travel proposals and submit travel intents to the trips' proposer.
 
 <p align="center">
