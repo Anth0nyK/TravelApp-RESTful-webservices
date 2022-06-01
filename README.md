@@ -43,6 +43,10 @@ The last method is a “admin” only method. After doing the HTTP Basic authent
 
 - Java
 - The Jersey RESTful Web Services framework
+- API
+- HTTP Authentication
+- RabbitMQ
+- Tomcat
 
 [Back To The Top](#travel-proposal-application-restful-api)
 
