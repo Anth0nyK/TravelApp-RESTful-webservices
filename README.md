@@ -22,7 +22,7 @@ This project contains a Java travel proposal application supported by a RESTful 
 The RESTful web service was built on Java using the Jersey framework running on local Tomcat server and connected to 2 external web APIs (RANDOM.ORG and World Weather Online) and a RabbitMQ server. It has 7 methods exposed as REST methods for external clients to consume.
 
 <p align="center">
-  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/2.png" width="350" title="API structure">
+  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/2.png" width="550" title="API structure">
 </p>
 
 2 of the methods are related to account registration and login. The user can use the account/PUT method to create a new account to use the web service and they can use the login/POST method to verify their credential.  The login method should be used on the official client where the user can login in the client. As the main methods of the web service requires HTTP Basic authentication, If the credential is correct, the client will save the credential and the login status for the user, so that they do not need to keep identifying themselves for every method calls.
