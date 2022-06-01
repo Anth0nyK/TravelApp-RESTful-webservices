@@ -49,18 +49,3 @@ The last method is a “admin” only method. After doing the HTTP Basic authent
 [Back To The Top](#travel-proposal-application-restful-api)
 
 ---
-
-## How To Use
-
-#### Installation
-
-
-
-#### API Reference
-
-```html
-    <p>dummy code</p>
-```
-[Back To The Top](#travel-proposal-application-restful-api)
-
----
