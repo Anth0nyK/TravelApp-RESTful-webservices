@@ -19,13 +19,13 @@
 This project contains a Java travel proposal application supported by a RESTful API which allows users to post, query travel proposals and submit travel intents to the trips' proposer.
 
 <p align="center">
-  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/1.png" width="350" title="App structure">
+  <img src="https://github.com/Anth0nyK/TravelApp-RESTfulAPI/blob/main/README_Images/1.png" width="350" title="App structure">
 </p>
 
 The RESTful web service was built on Java using the Jersey framework running on local Tomcat server and connected to 2 external web APIs (RANDOM.ORG and World Weather Online) and a RabbitMQ server. It has 7 methods exposed as REST methods for external clients to consume.
 
 <p align="center">
-  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/2.png" width="550" title="API structure">
+  <img src="https://github.com/Anth0nyK/TravelApp-RESTfulAPI/blob/main/README_Images/2.png" width="550" title="API structure">
 </p>
 
 2 of the methods are related to account registration and login. The user can use the **account/PUT** method to create a new account to use the web service and they can use the **login/POST** method to verify their credential.  The login method should be used on the official client where the user can login in the client. As the main methods of the web service requires HTTP Basic authentication, If the credential is correct, the client will save the credential and the login status for the user, so that they do not need to keep identifying themselves for every method calls.
@@ -42,7 +42,7 @@ For the **intent/GET** method, it only consumes “userID” as a parameter. It 
 The last method is a “admin” only method. After doing the HTTP Basic authentication, the system will be able to tell the role of the user. If the user’s role is “admin”, they will be able to use the **account/DELETE** method which will delete the user data from the system with the username specified.
 
 <p align="center">
-  <img src="https://github.com/Anth0nyK/SCCC-RESTful/blob/main/README_Images/3.png" width="550" title="design diagram">
+  <img src="https://github.com/Anth0nyK/TravelApp-RESTfulAPI/blob/main/README_Images/3.png" width="550" title="design diagram">
 </p>
 <p align="center">REST web service design diagram</p>
 
