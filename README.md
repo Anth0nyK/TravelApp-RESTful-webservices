@@ -5,6 +5,15 @@
 
 ## Description
 
+#### Technologies used
+
+- Java
+- The Jersey RESTful Web Services framework
+- API
+- HTTP Authentication
+- RabbitMQ
+- Tomcat
+
 This project contains a Java travel proposal application supported by a RESTful API which allows users to post, query travel proposals and submit travel intents to the trips' proposer.
 
 <p align="center">
@@ -29,16 +38,6 @@ For the intent/POST method, it allows the user to send a travel intent message t
 For the intent/GET method, it only consumes “userID” as a parameter. It allows the user to get the intent message which related to them by consuming to their own direct message queue which bound to the direct exchange in the RabbitMQ.
 
 The last method is a “admin” only method. After doing the HTTP Basic authentication, the system will be able to tell the role of the user. If the user’s role is “admin”, they will be able to use the account/DELETE method which will delete the user data from the system with the username specified.
-
-
-#### Technologies
-
-- Java
-- The Jersey RESTful Web Services framework
-- API
-- HTTP Authentication
-- RabbitMQ
-- Tomcat
 
 [Back To The Top](#travel-proposal-application-restful-api)
 
